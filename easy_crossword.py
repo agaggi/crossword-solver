@@ -3,14 +3,13 @@ import time
 
 import utility
 
-BACKTRACK = False
-
 class EasyCrossword:
 
     def __init__(self):
 
         '''Class implements methods to solve the easy crossword puzzle.'''
 
+        self.backtracking = False
         self.num_backtracks = 0
         self.start_time = time.time()
         self.attributes = []
@@ -185,8 +184,6 @@ Number of backtracks: {self.num_backtracks}
         :param used_words: The list of used words
         '''
 
-        global BACKTRACK
-
         utility.print_puzzle(crossword)
         self.completion_check(crossword)
 
@@ -194,7 +191,7 @@ Number of backtracks: {self.num_backtracks}
 
         for word in self.attributes[attr_index][2]:
 
-            if BACKTRACK:
+            if self.backtracking:
 
                 print('=> Backtracking')
                 self.num_backtracks += 1
@@ -203,7 +200,7 @@ Number of backtracks: {self.num_backtracks}
                 used_words.pop()
                 crossword = self.remove_word(crossword, self.attributes[attr_index-1])
 
-                BACKTRACK = False
+                self.backtracking = False
 
             if word not in used_words:
 
@@ -271,4 +268,4 @@ Number of backtracks: {self.num_backtracks}
                         used_words.append(word)
                         self.solve(crossword_copy, attr_index+1, used_words)
 
-        BACKTRACK = True
+        self.backtracking = True

@@ -4,118 +4,116 @@ import time
 import utility
 
 BACKTRACK = False
-NUM_BACKTRACKS = 0
-START = time.time()
 
-def generateAttributes():
+class EasyCrossword:
 
-    '''Generates the attributes for the crossword puzzle.
-    
-    By using the crossword puzzle and word list read in, attributes are assigned to
-    each "number" on the crossword puzzle. Attributes include:
-    
-    1. A string containing `crossword[i][j]`, the current integer found through 
-    `.isdigit()`, and either ACROSS or DOWN depending on the wordspace's 
-    characteristics.
+    def __init__(self):
 
-    2. The coordinates of where the wordspace starts. This is the `i` and `j` value
-    of where a number is found.
+        '''Class implements methods to solve the easy crossword puzzle.'''
 
-    3. The words that are valid for the particular wordspace. These words must equal
-    the length of the word space. Ex:
-        
-            len('HOSES') = 5
-            utility.getAcrossLength(...) -> return 5
-        
-        - Therefore, the word is compatible with the wordspace.
-    '''
+        self.num_backtracks = 0
+        self.start_time = time.time()
+        self.attributes = []
 
-    # Reading each file and spliting its contents into respective lists
-    crossword_file = open('crossword_puzzles/medium_crossword.txt', 'r')
-    word_file = open('words/hard_words.txt', 'r')
 
-    crossword = crossword_file.read().split()
-    words = word_file.read().split()
-    
-    attributes = []
-    coordinates = []
+    def generate_attributes(self):
 
-    # Printing the initial crossword puzzle (unsolved)
-    print('Unfilled crossword puzzle: ')
-    utility.printPuzzle(crossword)
+        '''Generates the attributes for the crossword puzzle.
 
-    for i in range(len(crossword)):
+        Using the crossword puzzle and word list read in, attributes are assigned to
+        each word space in the crossword puzzle. Attributes include:
 
-        for j in range(len(crossword[i])):
+        1. Whether the word space is across or down.
 
-            # Either across or down. Get the words that satisfy the domain constraints
-            if crossword[i][j] == '*':
+        2. The coordinates of where the word space starts (i.e. the current `i` and `j`).
 
-                if utility.isAcross(crossword, i, j):
+        3. The words valid for the particular word space (i.e. words that equal the length of
+        the word space). Ex:
 
-                    wordLength = utility.getAcrossLength(crossword, i, j)
-                    validWords = []
+                len('HOSES') = 5
+                utility.getAcrossLength(...) -> return 5
+        '''
 
-                    for word in words:
+        # Reading each file and spliting its contents into respective lists
+        crossword_file = open('crossword puzzles/easy_crossword.txt', 'r')
+        word_file = open('wordlists/easy_wordlist.txt', 'r')
 
-                        if len(word) == wordLength:
+        crossword = crossword_file.read().split()
+        words = word_file.read().split()
 
-                            validWords.append(word)
+        for i, row in enumerate(crossword):
+
+            for j, element in enumerate(row):
+
+                # Either across or down. Get the words that satisfy the domain constraints
+                if element == '*':
+
+                    if utility.is_across(crossword, i, j):
+
+                        word_length = utility.across_length(crossword, i, j)
+                        valid_words = []
+
+                        for word in words:
+
+                            if len(word) == word_length:
+
+                                valid_words.append(word)
+
+                        self.attributes.append(['ACROSS', (i, j), valid_words])
+
+                    if utility.is_down(crossword, i, j):
+
+                        word_length = utility.down_length(crossword, i, j)
+                        valid_words = []
+
+                        for word in words:
+
+                            if len(word) == word_length:
+
+                                valid_words.append(word)
+
+                        self.attributes.append(['DOWN', (i, j), valid_words])
+
+        crossword_file.close()
+        word_file.close()
+
+        del words
+
+        self.degree_heuristic()
+
+        self.solve(crossword, 0, [])
+
+    def degree_heuristic(self):
+
+        # Obtaining the degree of each wordspace
+        for attribute in self.attributes:
+
+            degree = 0
+            wordLength = len(attribute[2][0])
+            row, col = attribute[1]
+# ------------------------------------------------------------------
+            if attribute[0] == 'ACROSS':
+
+                for i in range(col, col + wordLength):
                     
-                    attributes.append(['ACROSS', (i, j), validWords])
-                    coordinates.append((i, j))
+                    if (row, i) in coordinates:
+                        
+                        degree += 1
 
-                if utility.isDown(crossword, i, j):
+            if attribute[0] == 'DOWN':
 
-                    wordLength = utility.getDownLength(crossword, i, j)
-                    validWords = []
+                for i in range(row, row + wordLength):
 
-                    for word in words:
+                    if (i, col) in coordinates:
 
-                        if len(word) == wordLength:
-
-                            validWords.append(word)
-                    
-                    attributes.append(['DOWN', (i, j), validWords])
-                    coordinates.append((i, j))
-    
-    crossword_file.close()
-    word_file.close()
-    
-    del(words)
-
-    # Obtaining the degree of each wordspace
-    for attribute in attributes:
-
-        degree = 0
-        wordLength = len(attribute[2][0])
-
-        row = attribute[1][0]
-        col = attribute[1][1]
-
-        if attribute[0] == 'ACROSS':
-
-            for i in range(col, col + wordLength):
-                
-                if (row, i) in coordinates:
-                    
-                    degree += 1
-
-        if attribute[0] == 'DOWN':
-
-            for i in range(row, row + wordLength):
-
-                if (i, col) in coordinates:
-
-                    degree += 1
+                        degree += 1
+            
+            attribute.append(degree)
         
-        attribute.append(degree)
-    
-    del coordinates
+        del coordinates
 
-    # Sort the attributes based on degree of constraints (most first)
-    attributes.sort(reverse=True, key=degree_heuristic)
-    solve(crossword, attributes, 0, [])
+        # Sort the attributes based on degree of constraints (most first)
+        attributes.sort(reverse=True, key=degree_heuristic)
 
 
 def degree_heuristic(attribute):
