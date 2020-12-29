@@ -1,4 +1,4 @@
-# CS 580 Assignment 3
+# Crossword Puzzle Solver
 
 ## Program Requirements
 
@@ -18,17 +18,18 @@ py .\main.py [crossword difficulty]
 
 ### Arguments
 
+The following arguments are valid:
+
 | Argument       | Crossword File         | Word List Used
 | :------------: | :--------------------: | :-------------:
 | `easy`         | `easy_crossword.txt`   | Easy
-| `medium`       | `medium_crossword.txt` | Hard
 | `hard`         | `hard_crossword.txt`   | Hard
 
 ## Analysis
 
 ### Easy Crossword
 
-The easy crossword puzzle contains only eight possible wordspaces, making it quick to obtain a solution. Backtracking alone was used in this implementation, but a solution was found quickly.
+The easy crossword puzzle contains **8** possible wordspaces with few constraints, making it easier to find a solution state. The word list used with this puzzle contained **15** words. Backtracking alone was used in this implementation, but a solution was found quickly.
 
 ```
 HOSES
@@ -39,14 +40,14 @@ LASER
 E##L#
 
 
--- Puzzle solved after 0.0012776851654052734 seconds --
+-- Puzzle solved after 0.0007722377777099609 seconds --
 
 Number of backtracks: 12
 ```
 
-### Medium Crossword
+### Hard Crossword
 
-The medium puzzle had slightly more wordspaces, with a much larger wordlist of ~21,000 words. A combination of backtracking, degree heuristic, and forward checking were used in order to solve the puzzle. At first, I simply ran the board with only backtrackingand got this result:
+The hard puzzle had slightly more wordspaces (**11**), with a much larger wordlist of ~**21,000** words. A combination of backtracking, degree heuristic, and forward checking were used in order to solve the puzzle. At first, I simply ran the board with **only backtracking** and obtained this result:
 
 ```
 ##abalone####
@@ -67,7 +68,7 @@ obtain###e###
 Number of backtracks: 14
 ```
 
-I then added a degree heuristic that sorted attributes by their number of constraints as well as forward checking. Forward checking made the most notable impact, as before words were placed onto the board, the current wordspace would be checked for any letters. If a word in the current domain did not satisfy the constraints, it was removed. This resulted in absolutely no backtracking, but the additional checks made the runtime longer:
+We, however, wanted to find a solution that minimized the use of backtracking. I added a degree heuristic that sorted attributes by their number of constraints, as well as forward checking. Forward checking made the most notable impact, as before words were placed onto the board, the current wordspace would be checked for any letters. If a word in the current domain did not satisfy the constraints, it was removed. This resulted in absolutely no backtracking, but the additional checks made the runtime longer:
 
 ```
 ##abalone####
@@ -83,26 +84,7 @@ obtain###c###
 #e##s####y###
 
 
--- Puzzle solved after 0.44267749786376953 seconds --
+-- Puzzle solved after 0.4260573387145996 seconds --
 
 Number of backtracks: 0
 ```
-
-### Hard Crossword
-
-```
-##***###***###
-#*___*#*___*##
-#*____#*____##
-*__#*_*__#*_*#
-*__*#*__#*___#
-*___#*__#*___#
-#*__*###*___##
-##*__*#*___###
-###*__*___####
-####*____#####
-#####NTH######
-######_#######
-```
-
-The hard crossword contains over 40 possible variables, making it take much longer to obtain a solution. Through my testing I was unable to obtain a solution, as I was running out of time to complete the assignment. I used the same degree heuristic and forward checking method; however, only a few words were placed before the program backtracked continuously.

@@ -1,7 +1,7 @@
 import sys
 
 from easy_crossword import EasyCrossword
-import hard_crossword
+from hard_crossword import HardCrossword
 
 def main():
 
@@ -20,8 +20,8 @@ def main():
 
     elif sys.argv[1].lower() == 'hard':
 
-        hard_crossword.generateAttributes()
-
+        hard = HardCrossword()
+        hard.generate_attributes()
     # except IndexError:
 
     #     print('\n -- Invalid argument entered, see README file for valid arguments --\n')
