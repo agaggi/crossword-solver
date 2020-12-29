@@ -11,20 +11,21 @@ def main():
     program will run on.
     '''
 
-    #try:
+    try:
 
-    if sys.argv[1].lower() == 'easy':
+        if sys.argv[1].lower() == 'easy':
 
-        easy = EasyCrossword()
-        easy.generate_attributes()
+            easy = EasyCrossword()
+            easy.generate_attributes()
 
-    elif sys.argv[1].lower() == 'hard':
+        elif sys.argv[1].lower() == 'hard':
 
-        hard = HardCrossword()
-        hard.generate_attributes()
-    # except IndexError:
+            hard = HardCrossword()
+            hard.generate_attributes()
 
-    #     print('\n -- Invalid argument entered, see README file for valid arguments --\n')
+    except IndexError:
+
+        print('\n -- Invalid argument entered, see README file for valid arguments --\n')
 
 
 if __name__ == '__main__':
